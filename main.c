@@ -22,8 +22,8 @@ int row = 0;
 int antw_OK = 0;
 int col_pos = 0;
 int row_pos	= 0;
-int old_col_pos = 0;
-int old_row_pos	= 0;
+int old_col_pos = -1;
+int old_row_pos	= -1;
 int antw_nr = 0;
 int old_col = 0;
 int old_row = 0;
@@ -31,6 +31,7 @@ int time_minutes = 60;
 int time_seconds = 0;
 int old_sec=0;
 int do_update=1;
+
 
 //init numbers
 char cijfers[10][20]={ 	{' ','=','=',' ','|',' ',' ','|',' ',' ',' ',' ','|',' ',' ','|',' ','=','=',' '},//0
@@ -132,6 +133,7 @@ static void Catch(int sig){
 	time_minutes--;
 	refresh();
 	sleep(3);
+	clear();
 	
 	/*Draw_Text();
 	
@@ -204,7 +206,6 @@ void Draw_Text(void){
 	if(do_update>0){
 		do_update=0;
 		if (has_colors()){
-			
 			bkgd(COLOR_PAIR(1));
 			attrset(COLOR_PAIR(1));
 		}
@@ -296,13 +297,6 @@ void Draw_Text(void){
 		/**/
 		mvprintw((row/2)-1, (col-strlen(Welkom_str[1]))/2, Welkom_str[1]);
 
-		//Cursor op scherm zetten
-		if(row_pos!=old_row_pos || col_pos!=old_col_pos){
-			mvprintw((row/2)+old_row_pos, ((col/2)-(sizeof(Antwoord_str[0])/2)+old_col_pos), " ");
-			old_col_pos=col_pos;
-			old_row_pos=row_pos;
-			mvprintw((row/2)+row_pos, ((col/2)-(sizeof(Antwoord_str[0])/2)+col_pos), "_");
-		}
 		
 		antw_OK=0;
 		/* Antwoord 1 op scherm zetten */
@@ -360,6 +354,27 @@ void Draw_Text(void){
 			antw_OK++;
 		}
 		mvprintw((row/2)+3,(col-sizeof(Antwoord_str[3]))/2,Ingave_str[3]);
+
+		//Cursor op scherm zetten
+		if (has_colors()){
+			//bkgd(COLOR_PAIR(3));
+			attrset(COLOR_PAIR(3));
+		}
+		//if(row_pos!=old_row_pos || col_pos!=old_col_pos){
+			//mvprintw((row/2)+old_row_pos, ((col/2)-(sizeof(Antwoord_str[0])/2)+old_col_pos), " ");
+			//old_col_pos=col_pos;
+			//old_row_pos=row_pos;
+			if(Ingave_str[row_pos][col_pos]=='\0'){
+				mvaddch((row/2)+row_pos, ((col/2)-(sizeof(Antwoord_str[0])/2)+col_pos), ' ');
+			}
+			else{
+				mvaddch((row/2)+row_pos, ((col/2)-(sizeof(Antwoord_str[0])/2)+col_pos), (const chtype)Ingave_str[row_pos][col_pos]);
+			}
+		//}
+		if (has_colors()){
+			//bkgd(COLOR_PAIR(1));
+			attrset(COLOR_PAIR(1));
+		}
 
 		wrefresh(stdscr);
 	
