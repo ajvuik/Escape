@@ -27,7 +27,7 @@ int old_row_pos	= -1;
 int antw_nr = 0;
 int old_col = 0;
 int old_row = 0;
-int time_minutes = 60;
+int time_minutes = 120;
 int time_seconds = 0;
 int old_sec=0;
 int do_update=1;
@@ -60,10 +60,11 @@ main(int argc, char *argv[])
 	int num = 0;
 	int run = 1;
 
+	signal(SIGQUIT, Catch);
     signal(SIGINT, Catch);      /* Catch interrupts, for those who want to cheat! */
 
 	//Init wiringx
-	if(wiringXSetup("orangepione", NULL) == -1) {
+	if(wiringXSetup("bananapi1", NULL) == -1) {
 		wiringXGC();
 		return -1;
 	}
@@ -212,7 +213,50 @@ void Draw_Text(void){
 		mvprintw((row/2)-10, (col-strlen(Welkom_str[0]))/2, Welkom_str[0]);
 		
 		//Resterende tijd op het scherm zetten
-		int Cur_number=time_minutes/10;
+		int Cur_number=0;
+		if(time_minutes<100){
+			for(int y=0; y<20; y++){
+				if(y<4){
+					mvaddch((row/2)-7, (col/2)-(13-y), ' ');
+				}
+				else if(y<8){
+					mvaddch((row/2)-6, (col/2)-(13-(y-4)), ' ');
+				}
+				else if(y<12){
+					mvaddch((row/2)-5, (col/2)-(13-(y-8)), ' ');
+				}
+				else if(y<16){
+					mvaddch((row/2)-4, (col/2)-(13-(y-12)), ' ');
+				}
+				else{
+					mvaddch((row/2)-3, (col/2)-(13-(y-16)), ' ');
+				}
+			}
+		}
+		else{
+			Cur_number=time_minutes/100;
+			for(int y=0; y<20; y++){
+				if(y<4){
+					mvaddch((row/2)-7, (col/2)-(13-y), cijfers[Cur_number][y]);
+				}
+				else if(y<8){
+					mvaddch((row/2)-6, (col/2)-(13-(y-4)), cijfers[Cur_number][y]);
+				}
+				else if(y<12){
+					mvaddch((row/2)-5, (col/2)-(13-(y-8)), cijfers[Cur_number][y]);
+				}
+				else if(y<16){
+					mvaddch((row/2)-4, (col/2)-(13-(y-12)), cijfers[Cur_number][y]);
+				}
+				else{
+					mvaddch((row/2)-3, (col/2)-(13-(y-16)), cijfers[Cur_number][y]);
+				}
+			}
+		}
+
+		Cur_number=time_minutes/10;
+		Cur_number=Cur_number%10;
+		
 		for(int y=0; y<20; y++){
 			if(y<4){
 				mvaddch((row/2)-7, (col/2)-(9-y), cijfers[Cur_number][y]);
@@ -401,7 +445,7 @@ void File_Handling(void){
 		endwin();
 
 		fclose(fp);
-		exit(0);
+		exit(-1);
 	}
 	//else{
 		fgets(Welkom_str[0], 50, (FILE*)fp);
@@ -502,6 +546,7 @@ void Loose(void){
 		}
 	}
 	
+	echo();
     endwin();
 	wiringXGC();
 
