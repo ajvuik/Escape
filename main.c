@@ -8,6 +8,9 @@
 
 #include "wiringx.h"
 
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_mixer.h"
+
 #define Ant1_Goed_pin	0
 #define Ant1_Fout_pin	1
 
@@ -27,11 +30,13 @@ int old_row_pos	= -1;
 int antw_nr = 0;
 int old_col = 0;
 int old_row = 0;
-int time_minutes = 120;
+int time_hours = 1;
+int time_minutes = 30;
 int time_seconds = 0;
 int old_sec=0;
 int do_update=1;
 
+static const char *LabSound = "SCI-FI Laboratory Sound.ogg";
 
 //init numbers
 char cijfers[10][20]={ 	{' ','=','=',' ','|',' ',' ','|',' ',' ',' ',' ','|',' ',' ','|',' ','=','=',' '},//0
@@ -54,13 +59,16 @@ void Time_Handler(void);
 void Finish(void);
 void Loose(void);
 
+
 int
 main(int argc, char *argv[])
 {
 	int num = 0;
 	int run = 1;
 
-	signal(SIGQUIT, Catch);
+    int result = 0;
+    int flags = MIX_INIT_OGG;
+
     signal(SIGINT, Catch);      /* Catch interrupts, for those who want to cheat! */
 
 	//Init wiringx
@@ -74,6 +82,28 @@ main(int argc, char *argv[])
 	//Read in the file
 	File_Handling();
 	
+	//SDL functions
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        printf("Failed to init SDL\n");
+        exit(1);
+    }
+
+    if (flags != (result = Mix_Init(flags))) {
+        printf("Could not initialize mixer (result: %d).\n", result);
+        printf("Mix_Init: %s\n", Mix_GetError());
+        exit(1);
+    }
+
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096)==-1){
+        printf("Could not open audio\n");
+        printf("Mix_Init: %s\n", Mix_GetError());
+        exit(1);
+	}
+
+    Mix_Music *music = Mix_LoadMUS(MY_COOL_MP3);
+    printf("Playing music\n");
+    Mix_PlayMusic(music, 1);
+
 	//Ncurses functions
     initscr();      /* initialize the curses library */
     keypad(stdscr, TRUE);  /* enable keyboard mapping */
@@ -98,11 +128,12 @@ main(int argc, char *argv[])
 	refresh();*/
 
     while (run){
-		getmaxyx(stdscr, row, col);		/* get the number of rows and columns */
-		if(row!=old_row || col!=old_col){ /* Handle a screen resize*/
+		getmaxyx(stdscr, row, col);		/* get the number of rows and columns *
+		if(row!=old_row || col!=old_col){ /* Handle a screen resize*
 			old_col=col;
 			old_row=row;
 		}
+		/**/
 		Time_Handler();
 		Handle_Input();
 		Draw_Text();
@@ -113,7 +144,7 @@ main(int argc, char *argv[])
 			run=0;
 		}
 		
-		if(time_seconds==0 && time_minutes==0){
+		if(time_seconds==0 && time_minutes==0 && time_hours==0){
 			Loose();
 		}
     }
@@ -131,7 +162,23 @@ static void Catch(int sig){
 		attrset(COLOR_PAIR(2));
 	}
 	mvprintw((row/2),((col-sizeof("YOU CANNOT ESCAPE LIKE THIS!!!"))/2),"YOU CANNOT ESCAPE LIKE THIS!!!");
-	time_minutes--;
+	if(time_hours>0){
+		if (time_minutes>10){
+			time_minutes=time_minutes-10;
+		}
+		else if(time_minutes==10){
+			time_hours--;
+			time_minutes=0;
+		}
+		else{
+			int remain_minutes = 10-time_minutes;
+			time_hours--;
+			time_minutes=60-remain_minutes;
+		}
+	}
+	else if (time_minutes>10){
+		time_minutes=time_minutes-10;
+	}
 	refresh();
 	sleep(3);
 	clear();
@@ -143,6 +190,8 @@ static void Catch(int sig){
 
     exit(0);
 	/**/
+    signal(SIGINT, Catch);      /* Reinstate the catch */
+	return;
 }
 
 void Handle_Input(void){
@@ -214,49 +263,32 @@ void Draw_Text(void){
 		
 		//Resterende tijd op het scherm zetten
 		int Cur_number=0;
-		if(time_minutes<100){
-			for(int y=0; y<20; y++){
-				if(y<4){
-					mvaddch((row/2)-7, (col/2)-(13-y), ' ');
-				}
-				else if(y<8){
-					mvaddch((row/2)-6, (col/2)-(13-(y-4)), ' ');
-				}
-				else if(y<12){
-					mvaddch((row/2)-5, (col/2)-(13-(y-8)), ' ');
-				}
-				else if(y<16){
-					mvaddch((row/2)-4, (col/2)-(13-(y-12)), ' ');
-				}
-				else{
-					mvaddch((row/2)-3, (col/2)-(13-(y-16)), ' ');
-				}
+		Cur_number=time_hours;
+		for(int y=0; y<20; y++){
+			if(y<4){
+				mvaddch((row/2)-7, (col/2)-(16-y), cijfers[Cur_number][y]);
 			}
-		}
-		else{
-			Cur_number=time_minutes/100;
-			for(int y=0; y<20; y++){
-				if(y<4){
-					mvaddch((row/2)-7, (col/2)-(13-y), cijfers[Cur_number][y]);
-				}
-				else if(y<8){
-					mvaddch((row/2)-6, (col/2)-(13-(y-4)), cijfers[Cur_number][y]);
-				}
-				else if(y<12){
-					mvaddch((row/2)-5, (col/2)-(13-(y-8)), cijfers[Cur_number][y]);
-				}
-				else if(y<16){
-					mvaddch((row/2)-4, (col/2)-(13-(y-12)), cijfers[Cur_number][y]);
-				}
-				else{
-					mvaddch((row/2)-3, (col/2)-(13-(y-16)), cijfers[Cur_number][y]);
-				}
+			else if(y<8){
+				mvaddch((row/2)-6, (col/2)-(16-(y-4)), cijfers[Cur_number][y]);
+			}
+			else if(y<12){
+				mvaddch((row/2)-5, (col/2)-(16-(y-8)), cijfers[Cur_number][y]);
+			}
+			else if(y<16){
+				mvaddch((row/2)-4, (col/2)-(16-(y-12)), cijfers[Cur_number][y]);
+			}
+			else{
+				mvaddch((row/2)-3, (col/2)-(16-(y-16)), cijfers[Cur_number][y]);
 			}
 		}
 
+		mvaddch((row/2)-7, (col/2)-11, ' ');
+		mvaddch((row/2)-6, (col/2)-11, ':');
+		mvaddch((row/2)-5, (col/2)-11, ' ');
+		mvaddch((row/2)-4, (col/2)-11, ':');
+		mvaddch((row/2)-3, (col/2)-11, ' ');
+
 		Cur_number=time_minutes/10;
-		Cur_number=Cur_number%10;
-		
 		for(int y=0; y<20; y++){
 			if(y<4){
 				mvaddch((row/2)-7, (col/2)-(9-y), cijfers[Cur_number][y]);
@@ -497,8 +529,12 @@ void Time_Handler(void){
 	if(old_sec!=(int)tm.tm_sec){
 		do_update++;
 		old_sec=(int)tm.tm_sec;
-		
-		if(time_seconds==0 && time_minutes>0){
+		if (time_hours>0 && time_minutes==0 && time_seconds==0){
+			time_seconds=59;
+			time_minutes=59;
+			time_hours--;
+		}
+		else if(time_seconds==0 && time_minutes>0){
 			time_seconds=59;
 			time_minutes--;
 		}
