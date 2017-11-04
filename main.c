@@ -109,7 +109,7 @@ main(int argc, char *argv[])
 
     Mix_Music *music = Mix_LoadMUS(LabSound);
     //printf("Playing music\n");
-    Mix_PlayMusic(music, 1);
+    //Mix_PlayMusic(music, 1);
 
 	//Ncurses functions
     initscr();      /* initialize the curses library */
@@ -152,7 +152,7 @@ main(int argc, char *argv[])
 
 	clear();
 
-    Mix_Chunk *JamesDie = Mix_LoadMUS(Die);
+    Mix_Music *JamesDie = Mix_LoadMUS(Die);
 	channel = Mix_PlayChannel(-1, JamesDie, 0); 
 	if(channel == -1) { fprintf(stderr, "Unable to play OGG file: %s\n", Mix_GetError()); } 
     
