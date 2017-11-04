@@ -105,6 +105,7 @@ main(int argc, char *argv[])
         printf("Mix_Init: %s\n", Mix_GetError());
         exit(1);
 	}
+	Mix_AllocateChannels(4);
 
     Mix_Music *music = Mix_LoadMUS(LabSound);
     //printf("Playing music\n");
@@ -133,6 +134,10 @@ main(int argc, char *argv[])
 	Handle_Input();
 	refresh();*/
 	clear();
+	if (has_colors()){
+		bkgd(COLOR_PAIR(1));
+		attrset(COLOR_PAIR(1));
+	}
 	getmaxyx(stdscr, row, col);		/* get the number of rows and columns */
 	mvprintw((row/2),((col-sizeof("Welkom bij MI6"))/2),"Welkom bij MI6");
 	mvprintw((row/2)+1,((col-sizeof("Log in AUB!:"))/2),"Log in AUB!:");
