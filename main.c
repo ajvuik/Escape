@@ -39,6 +39,7 @@ int old_sec=0;
 int do_update=1;
 
 static const char *LabSound = "SCI-FI Laboratory Sound.ogg";
+static const char *Die = "I Expect you To Die.ogg";
 
 //init numbers
 char cijfers[10][20]={ 	{' ','=','=',' ','|',' ',' ','|',' ',' ',' ',' ','|',' ',' ','|',' ','=','=',' '},//0
@@ -70,6 +71,7 @@ main(int argc, char *argv[])
 
     int result = 0;
     int flags = MIX_INIT_OGG;
+	int channel;
 
     signal(SIGINT, Catch);      /* Catch interrupts, for those who want to cheat! */
 
@@ -105,7 +107,7 @@ main(int argc, char *argv[])
 	}
 
     Mix_Music *music = Mix_LoadMUS(LabSound);
-    printf("Playing music\n");
+    //printf("Playing music\n");
     Mix_PlayMusic(music, 1);
 
 	//Ncurses functions
@@ -130,8 +132,21 @@ main(int argc, char *argv[])
 	Draw_Text(); 					/*Print the text on the screen*
 	Handle_Input();
 	refresh();*/
+	mvprintw((row/2),((col-sizeof("Welkom bij MI6"))/2),"Welkom bij MI6");
+	mvprintw((row/2)+1,((col-sizeof("Log in AUB!:"))/2),"Log in AUB!:");
+	wrefresh(stdscr);
 
-    while (run){
+	while(getch()==ERR);
+
+	clear();
+
+    Mix_Chunk *JamesDie = Mix_LoadMUS(Die);
+	channel = Mix_PlayChannel(-1, JamesDie, 0); 
+	if(channel == -1) { fprintf(stderr, "Unable to play OGG file: %s\n", Mix_GetError()); } 
+    
+	while(Mix_Playing(channel) != 0);
+	
+	while (run){
 		getmaxyx(stdscr, row, col);		/* get the number of rows and columns *
 		if(row!=old_row || col!=old_col){ /* Handle a screen resize*
 			old_col=col;
