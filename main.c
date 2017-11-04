@@ -133,6 +133,7 @@ main(int argc, char *argv[])
 	Handle_Input();
 	refresh();*/
 	clear();
+	getmaxyx(stdscr, row, col);		/* get the number of rows and columns */
 	mvprintw((row/2),((col-sizeof("Welkom bij MI6"))/2),"Welkom bij MI6");
 	mvprintw((row/2)+1,((col-sizeof("Log in AUB!:"))/2),"Log in AUB!:");
 	refresh();
