@@ -12,7 +12,9 @@
 #include "SDL2/SDL_mixer.h"
 
 #define Ant1_Goed_pin	0
-#define Ant1_Fout_pin	1
+#define Ant2_Goed_pin	1
+#define Ant3_Goed_pin	2
+#define Ant4_Goed_pin	3
 
 
 char Welkom_str[2][50]={0};
@@ -76,8 +78,10 @@ main(int argc, char *argv[])
 		wiringXGC();
 		return -1;
 	}
-	pinMode(Ant1_Fout_pin, PINMODE_OUTPUT);
 	pinMode(Ant1_Goed_pin, PINMODE_OUTPUT);
+	pinMode(Ant2_Goed_pin, PINMODE_OUTPUT);
+	pinMode(Ant3_Goed_pin, PINMODE_OUTPUT);
+	pinMode(Ant4_Goed_pin, PINMODE_OUTPUT);
 	
 	//Read in the file
 	File_Handling();
@@ -100,7 +104,7 @@ main(int argc, char *argv[])
         exit(1);
 	}
 
-    Mix_Music *music = Mix_LoadMUS(MY_COOL_MP3);
+    Mix_Music *music = Mix_LoadMUS(LabSound);
     printf("Playing music\n");
     Mix_PlayMusic(music, 1);
 
@@ -381,13 +385,11 @@ void Draw_Text(void){
 			attrset(COLOR_PAIR(4));
 			mvprintw((row/2),(col/2)+(sizeof(Antwoord_str[0])/2)+2,"FOUT");
 			attrset(COLOR_PAIR(1));
-			digitalWrite(Ant1_Fout_pin, HIGH);
 			digitalWrite(Ant1_Goed_pin, LOW);
 		}
 		else{
 			mvprintw((row/2),(col/2)+(sizeof(Antwoord_str[0])/2)+2,"GOED");
 			antw_OK++;
-			digitalWrite(Ant1_Fout_pin, LOW);
 			digitalWrite(Ant1_Goed_pin, HIGH);
 		}
 		mvprintw((row/2),(col-sizeof(Antwoord_str[0]))/2,Ingave_str[0]);
@@ -398,10 +400,12 @@ void Draw_Text(void){
 			attrset(COLOR_PAIR(4));
 			mvprintw((row/2)+1,(col/2)+(sizeof(Antwoord_str[1])/2)+2,"FOUT");
 			attrset(COLOR_PAIR(1));
+			digitalWrite(Ant2_Goed_pin, LOW);
 		}
 		else{
 			mvprintw((row/2)+1,(col/2)+(sizeof(Antwoord_str[1])/2)+2,"GOED");
 			antw_OK++;
+			digitalWrite(Ant2_Goed_pin, HIGH);
 		}
 		mvprintw((row/2)+1,(col-sizeof(Antwoord_str[1]))/2,Ingave_str[1]);
 
@@ -411,10 +415,12 @@ void Draw_Text(void){
 			attrset(COLOR_PAIR(4));
 			mvprintw((row/2)+2,(col/2)+(sizeof(Antwoord_str[2])/2)+2,"FOUT");
 			attrset(COLOR_PAIR(1));
+			digitalWrite(Ant3_Goed_pin, LOW);
 		}
 		else{
 			mvprintw((row/2)+2,(col/2)+(sizeof(Antwoord_str[2])/2)+2,"GOED");
 			antw_OK++;
+			digitalWrite(Ant3_Goed_pin, HIGH);
 		}
 		mvprintw((row/2)+2,(col-sizeof(Antwoord_str[2]))/2,Ingave_str[2]);
 		
@@ -424,10 +430,12 @@ void Draw_Text(void){
 			attrset(COLOR_PAIR(4));
 			mvprintw((row/2)+3,(col/2)+(sizeof(Antwoord_str[3])/2)+2,"FOUT");
 			attrset(COLOR_PAIR(1));
+			digitalWrite(Ant4_Goed_pin, LOW);
 		}
 		else{
 			mvprintw((row/2)+3,(col/2)+(sizeof(Antwoord_str[3])/2)+2,"GOED");
 			antw_OK++;
+			digitalWrite(Ant4_Goed_pin, HIGH);
 		}
 		mvprintw((row/2)+3,(col-sizeof(Antwoord_str[3]))/2,Ingave_str[3]);
 
