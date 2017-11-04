@@ -153,10 +153,11 @@ main(int argc, char *argv[])
 	clear();
 
     Mix_Music *JamesDie = Mix_LoadMUS(Die);
-	channel = Mix_PlayChannel(-1, JamesDie, 0); 
+	Mix_PlayMusic(JamesDie, 1);
+	//int channel = Mix_PlayChannel(-1, JamesDie, 0); 
 	if(channel == -1) { fprintf(stderr, "Unable to play OGG file: %s\n", Mix_GetError()); } 
     
-	while(Mix_Playing(channel) != 0);
+	//while(Mix_Playing(channel) != 0);
 	
 	while (run){
 		getmaxyx(stdscr, row, col);		/* get the number of rows and columns *
