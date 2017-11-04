@@ -132,12 +132,17 @@ main(int argc, char *argv[])
 	Draw_Text(); 					/*Print the text on the screen*
 	Handle_Input();
 	refresh();*/
+	clear();
 	mvprintw((row/2),((col-sizeof("Welkom bij MI6"))/2),"Welkom bij MI6");
 	mvprintw((row/2)+1,((col-sizeof("Log in AUB!:"))/2),"Log in AUB!:");
-	wrefresh(stdscr);
 	refresh();
-
-	while(getch()==ERR);
+	int wait = 1;
+	while(wait){
+	int c = getch();     /* refresh, accept single keystroke of input */
+		if(c!=ERR){
+			wait=0;
+		}
+	}
 
 	clear();
 
