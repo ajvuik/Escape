@@ -135,12 +135,13 @@ main(int argc, char *argv[])
 	mvprintw((row/2),((col-sizeof("Welkom bij MI6"))/2),"Welkom bij MI6");
 	mvprintw((row/2)+1,((col-sizeof("Log in AUB!:"))/2),"Log in AUB!:");
 	wrefresh(stdscr);
+	refresh();
 
 	while(getch()==ERR);
 
 	clear();
 
-    Mix_Music *JamesDie = Mix_LoadMUS(Die);
+    Mix_Chunk *JamesDie = Mix_LoadMUS(Die);
 	channel = Mix_PlayChannel(-1, JamesDie, 0); 
 	if(channel == -1) { fprintf(stderr, "Unable to play OGG file: %s\n", Mix_GetError()); } 
     
