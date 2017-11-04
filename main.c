@@ -140,7 +140,7 @@ main(int argc, char *argv[])
 
 	clear();
 
-    Mix_Chunk *JamesDie = Mix_LoadMUS(Die);
+    Mix_Music *JamesDie = Mix_LoadMUS(Die);
 	channel = Mix_PlayChannel(-1, JamesDie, 0); 
 	if(channel == -1) { fprintf(stderr, "Unable to play OGG file: %s\n", Mix_GetError()); } 
     
